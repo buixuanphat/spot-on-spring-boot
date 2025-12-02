@@ -12,7 +12,6 @@ import lombok.experimental.FieldDefaults;
 @Getter
 @Setter
 public class ApiResponse <T>{
-    boolean success;
     String message;
     T data;
 

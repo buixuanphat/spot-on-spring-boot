@@ -3,10 +3,9 @@ package com.buixuanphat.spot_on.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
-@Getter
-@Setter
 @Entity
 @Builder
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class Merchandise {

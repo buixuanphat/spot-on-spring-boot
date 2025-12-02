@@ -14,7 +14,7 @@ import org.springframework.web.multipart.MultipartFile;
 @Builder
 public class CreateMerchandiseDTO {
 
-    @Size(min = 3, max = 100, message = "NAME_INVALID")
+    @Size(min = 3, max = 100, message = "Tên vật phẩm phải lớn hơn 3 kí tự và bé hơn 100 kí tự")
     String name;
     Double price;
     MultipartFile image;

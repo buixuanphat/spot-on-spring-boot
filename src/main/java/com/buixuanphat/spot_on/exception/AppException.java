@@ -1,15 +1,15 @@
 package com.buixuanphat.spot_on.exception;
 
-import lombok.Builder;
-import lombok.Getter;
+import lombok.Data;
 
-@Builder
-@Getter
+@Data
 public class AppException extends RuntimeException {
-    ErrorMessage errorMessage;
+    int statusCode;
+    String message;
 
-    public AppException(ErrorMessage errorMessage) {
-        super(errorMessage.getMessage());
-        this.errorMessage = errorMessage;
+    public AppException(int statusCode, String message) {
+        super(message);
+        this.statusCode = statusCode;
+        this.message = message;
     }
 }

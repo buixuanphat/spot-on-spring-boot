@@ -1,6 +1,6 @@
 package com.buixuanphat.spot_on.entity;
 
-import com.buixuanphat.spot_on.enums.OrganizerStatus;
+import com.buixuanphat.spot_on.enums.Status;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
@@ -54,7 +54,7 @@ public class Event {
     private Boolean active = true;
 
     @Column(name = "status", nullable = false)
-    private String status = OrganizerStatus.pending.name();
+    private String status = Status.pending.name();
 
     @Column(name = "license")
     private String license;

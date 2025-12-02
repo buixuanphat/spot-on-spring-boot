@@ -9,7 +9,6 @@ import com.buixuanphat.spot_on.mapper.OrganizerMapper;
 import com.buixuanphat.spot_on.repository.MerchandiseRepository;
 import com.buixuanphat.spot_on.repository.OrganizerRepository;
 import jakarta.annotation.Nullable;
-import jakarta.persistence.EntityManager;
 import jakarta.persistence.criteria.*;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;

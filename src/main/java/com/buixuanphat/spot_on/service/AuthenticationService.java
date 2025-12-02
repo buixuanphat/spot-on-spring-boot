@@ -2,10 +2,12 @@ package com.buixuanphat.spot_on.service;
 
 import com.buixuanphat.spot_on.dto.authentication.AuthenticationRequestDTO;
 import com.buixuanphat.spot_on.dto.authentication.AuthenticationResponseDTO;
+import com.buixuanphat.spot_on.dto.user.UserResponseDTO;
 import com.buixuanphat.spot_on.entity.User;
 import com.buixuanphat.spot_on.exception.AppException;
-import com.buixuanphat.spot_on.exception.ErrorMessage;
+import com.buixuanphat.spot_on.mapper.UserMapper;
 import com.buixuanphat.spot_on.repository.UserRepository;
+import com.buixuanphat.spot_on.utils.DateUtils;
 import com.nimbusds.jose.*;
 import com.nimbusds.jose.crypto.MACSigner;
 import com.nimbusds.jwt.JWTClaimsSet;
@@ -15,7 +17,9 @@ import lombok.experimental.FieldDefaults;
 import lombok.experimental.NonFinal;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.access.AccessDeniedException;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -32,30 +36,45 @@ public class AuthenticationService {
 
     UserRepository userRepository;
 
+    UserMapper userMapper;
+
     @NonFinal
     @Value("${jwt.signerKey}")
     String signerKey;
 
     PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
+    public UserResponseDTO getCurrentUser ()
+    {
+        var auth = SecurityContextHolder.getContext().getAuthentication();
+        User user;
+        user = userRepository.findByEmail(String.valueOf(auth.getName())).orElseThrow(()->new AppException(HttpStatus.NON_AUTHORITATIVE_INFORMATION.value(), "Non-Authoritative Information"));
+        if(user != null)
+        {
+            UserResponseDTO response = userMapper.toUserResponseDTO(user);
+            response.setCreatedDate(DateUtils.instantToString(user.getCreatedDate()));
+            response.setDateOfBirth(DateUtils.localDateToString(user.getDateOfBirth()));
+            return response;
+        }
+        return new UserResponseDTO();
+    }
+
+
     public AuthenticationResponseDTO authenticate(AuthenticationRequestDTO request) {
         User u = userRepository.findByEmail(request.getEmail()).orElseThrow(() -> {
-            return new AppException(ErrorMessage.USER_NOT_FOUND);
+            return new AppException(HttpStatus.NOT_FOUND.value(), "Tài khoàn không tồn tại");
         });
 
         boolean isAuthenticated = passwordEncoder.matches(request.getPassword(), u.getPassword());
 
         if (!isAuthenticated) {
-            throw new AppException(ErrorMessage.WRONG_PASSWORD);
+            throw new AppException(HttpStatus.UNAUTHORIZED.value(), "Mật khẩu không chính xác" );
         } else {
             return AuthenticationResponseDTO.builder()
-                    .isAuthenticated(true)
                     .role(u.getRole())
                     .token(generateToken(u))
                     .build();
         }
-
-
     }
 
     private String generateToken(User u) {
@@ -67,7 +86,7 @@ public class AuthenticationService {
                 .issuer("spot_on_system")
                 .issueTime(new Date())
                 .expirationTime(new Date(
-                        Instant.now().plus(1, ChronoUnit.HOURS).toEpochMilli()
+                        Instant.now().plus(1, ChronoUnit.DAYS).toEpochMilli()
                 ))
                 .claim("scope", u.getRole())
                 .build();

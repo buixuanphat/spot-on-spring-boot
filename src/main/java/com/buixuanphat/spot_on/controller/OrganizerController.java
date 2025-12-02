@@ -34,13 +34,10 @@ public class OrganizerController {
 
 
     @PostMapping(value = "/organizers/register", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    ApiResponse<OrganizerResponseDTO> createOrganizer(@Valid @ModelAttribute OrganizerCreateRequestDTO requestDTO,
-                                                      @RequestParam MultipartFile avatar,
-                                                      @RequestParam MultipartFile businessLicense)
+    ApiResponse<OrganizerResponseDTO> createOrganizer(@Valid @ModelAttribute OrganizerCreateRequestDTO request)
     {
         return ApiResponse.<OrganizerResponseDTO>builder()
-                .success(true)
-                .data(organizerService.createOrganizer(requestDTO, avatar, businessLicense))
+                .data(organizerService.register(request))
                 .build();
     }
 
@@ -48,15 +45,21 @@ public class OrganizerController {
 
 
     @GetMapping("/organizers")
-    ApiResponse<Page<OrganizerResponseDTO>> getOrganizers (@RequestParam @Nullable String name,
+    ApiResponse<Page<OrganizerResponseDTO>> getOrganizers (@RequestParam @Nullable Integer id,
+                                                           @RequestParam @Nullable String name,
                                                            @RequestParam @Nullable String status,
                                                            @RequestParam(defaultValue = "0") int page
     )
     {
         return ApiResponse.<Page<OrganizerResponseDTO>>builder()
-                .success(true)
-                .data(organizerService.getOrganizers(name, status, page, pageSize))
+                .data(organizerService.getOrganizers(id, name, status, page, pageSize))
                 .build();
+    }
+
+    @GetMapping("/organizers/{id}")
+    ApiResponse<OrganizerResponseDTO> getOrganizer(@PathVariable Integer id)
+    {
+        return ApiResponse.<OrganizerResponseDTO>builder().data(organizerService.getOrganizer(id)).build();
     }
 
 
@@ -64,7 +67,6 @@ public class OrganizerController {
     ApiResponse<UserResponseDTO> verify(@PathVariable("organizerId") int organizerId, @RequestParam boolean accept)
     {
         return ApiResponse.<UserResponseDTO>builder()
-                .success(true)
                 .data(organizerService.verify(organizerId, accept))
                 .build();
     }

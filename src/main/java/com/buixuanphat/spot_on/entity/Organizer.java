@@ -1,13 +1,19 @@
 package com.buixuanphat.spot_on.entity;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.ColumnDefault;
 
 import java.time.Instant;
 
 @Entity
 @Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class Organizer {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

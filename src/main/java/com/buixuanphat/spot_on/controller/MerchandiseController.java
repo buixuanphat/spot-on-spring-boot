@@ -30,7 +30,6 @@ public class MerchandiseController {
     @PostMapping("/merchandises")
     ApiResponse<MerchandiseResponseDTO> create(@Valid @ModelAttribute CreateMerchandiseDTO request){
         return ApiResponse.<MerchandiseResponseDTO>builder()
-                .success(true)
                 .data(merchandiseService.create(request))
                 .build();
     }
@@ -41,7 +40,6 @@ public class MerchandiseController {
                                                               @RequestParam (defaultValue = "0") int page)
     {
         return ApiResponse.<Page<MerchandiseResponseDTO>>builder()
-                .success(true)
                 .data(merchandiseService.getMerchandises(organizerId, name, page, size))
                 .build();
     }

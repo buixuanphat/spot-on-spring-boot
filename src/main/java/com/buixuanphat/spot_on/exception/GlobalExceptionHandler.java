@@ -17,40 +17,27 @@ import java.util.Objects;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(value = AccessDeniedException.class)
-    ResponseEntity<ApiResponse<Void>> handleAccessDeniedException(AccessDeniedException e)
+    ResponseEntity<ApiResponse<String>> handleAccessDeniedException(AccessDeniedException e)
     {
-        ApiResponse<Void> apiResponse = new ApiResponse<>();
-        apiResponse.setSuccess(false);
-        apiResponse.setMessage(e.getMessage());
-        return ResponseEntity.status(ErrorMessage.UNAUTHORIZE.getCode()).body(apiResponse);
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ApiResponse.<String>builder().message(e.getMessage()).build());
     }
 
     @ExceptionHandler(value = AppException.class)
-    ResponseEntity<ApiResponse<Void>> handleAppException(AppException e)
+    ResponseEntity<ApiResponse<String>> handleAppException(AppException e)
     {
-        ApiResponse<Void> apiResponse = new ApiResponse<>();
-        apiResponse.setSuccess(false);
-        apiResponse.setMessage(e.getMessage());
-        return ResponseEntity.status(e.getErrorMessage().getCode()).body(apiResponse);
+        return ResponseEntity.status(e.getStatusCode()).body(ApiResponse.<String>builder().message(e.getMessage()).build());
     }
 
 
     @ExceptionHandler(value = MethodArgumentNotValidException.class)
-    ResponseEntity<ApiResponse<Void>> handleValidation(MethodArgumentNotValidException e)
+    ResponseEntity<ApiResponse<String>> handleValidation(MethodArgumentNotValidException e)
     {
-        String enumKey = Objects.requireNonNull(e.getFieldError()).getDefaultMessage();
-        ApiResponse<Void> apiResponse = new ApiResponse<>();
-        ErrorMessage errorMessage = ErrorMessage.valueOf(enumKey);
-        apiResponse.setMessage(errorMessage.getMessage());
-        return ResponseEntity.badRequest().body(apiResponse);
+        return ResponseEntity.badRequest().body(ApiResponse.<String>builder().message(e.getFieldError().getDefaultMessage()).build());
     }
 
     @ExceptionHandler(value = Exception.class)
-    ResponseEntity<ApiResponse<Void>> handleException(Exception e)
+    ResponseEntity<ApiResponse<String>> handleException(Exception e)
     {
-        ApiResponse<Void> apiResponse = new ApiResponse<>();
-        apiResponse.setSuccess(false);
-        apiResponse.setMessage(e.getMessage());
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(apiResponse);
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ApiResponse.<String>builder().message(e.getMessage()).build());
     }
 }

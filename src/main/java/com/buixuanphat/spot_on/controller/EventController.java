@@ -6,10 +6,14 @@ import com.buixuanphat.spot_on.dto.event.EventResponseDTO;
 import com.buixuanphat.spot_on.dto.section.CreateSectionDTO;
 import com.buixuanphat.spot_on.service.EventService;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import jakarta.annotation.Nullable;
 import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import lombok.experimental.NonFinal;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -24,14 +28,14 @@ public class EventController {
 
     EventService eventService;
 
-    @PostMapping(value = "/events", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    ApiResponse<EventResponseDTO> createEvent(@Valid @RequestParam String request,
-                                              @RequestParam MultipartFile image,
-                                              @RequestParam MultipartFile license,
-                                              @Valid @RequestParam String sections){
+    @Value("${pagination.page-size}")
+    @NonFinal
+    int pageSize;
+
+    @PostMapping(value = "/events/register", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    ApiResponse<EventResponseDTO> register (@Valid @ModelAttribute CreateEventDTO request){
         return ApiResponse.<EventResponseDTO>builder()
-                .success(true)
-                .data(eventService.createEvent(request, image, license, sections))
+                .data(eventService.register(request))
                 .build();
     }
 
@@ -39,8 +43,16 @@ public class EventController {
     ApiResponse<EventResponseDTO> verify(@PathVariable Integer eventId, @RequestParam boolean accept)
     {
         return ApiResponse.<EventResponseDTO>builder()
-                .success(true)
                 .data(eventService.verify(eventId, accept))
+                .build();
+    }
+
+
+    @GetMapping("/events")
+    ApiResponse<Page<EventResponseDTO>> getEvents(@RequestParam @Nullable Integer id, @RequestParam @Nullable String name, @RequestParam String status ,@RequestParam @Nullable Boolean active, @RequestParam(defaultValue = "0") Integer page)
+    {
+        return ApiResponse.<Page<EventResponseDTO>>builder()
+                .data(eventService.getEvents(id, name,status ,active, page ,pageSize))
                 .build();
     }
 

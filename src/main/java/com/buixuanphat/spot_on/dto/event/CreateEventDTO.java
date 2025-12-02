@@ -1,17 +1,11 @@
 package com.buixuanphat.spot_on.dto.event;
 
-import com.buixuanphat.spot_on.entity.Organizer;
-import com.buixuanphat.spot_on.enums.OrganizerStatus;
-import jakarta.persistence.*;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-import org.hibernate.annotations.ColumnDefault;
-
-import java.time.Instant;
+import org.springframework.web.multipart.MultipartFile;
 
 @Data
 @NoArgsConstructor
@@ -20,17 +14,19 @@ import java.time.Instant;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class CreateEventDTO {
 
-    @Size(min = 3, max = 100, message = "NAME_INVALID")
+    @Size(min = 3, max = 100, message = "Tên sự kiện phải lớn hơn 3 kí tự và bé hơn 100 kí tự")
     String name;
     String startTime;
     String endTime;
-    @Size(min = 3, max = 100, message = "ADDRESS_INVALID")
+    @Size(min = 3, max = 100, message = "Địa chỉ phải lớn hơn 3 kí tự và bé hơn 100 kí tự")
     String location;
-    @Size(min = 3, max = 100, message = "DESCRIPTION_INVALID")
+    @Size(min = 3, max = 100, message = "Mô tả phải lớn hơn 3 kí tự và bé hơn 100 kí tự")
     String description;
     Integer organizerId;
-    @Min(value = 0, message = "AGE_LIMIT_INVALID")
-    @Max(value = 18, message = "AGE_LIMIT_INVALID")
+    @Min(value = 6, message = "Độ tuổi giới hạn phải từ 6 đến 18 tuổi")
+    @Max(value = 18, message = "Độ tuổi giới hạn phải từ 6 đến 18 tuổi")
     Integer ageLimit;
+    MultipartFile image;
+    MultipartFile license;
 
 }

@@ -13,5 +13,6 @@ public interface UserMapper {
     User toUser(CreateCustomerRequestDTO createCustomerRequestDTO);
 
     @Mapping(target = "dateOfBirth", ignore = true)
+    @Mapping(target = "createdDate", ignore = true)
     UserResponseDTO toUserResponseDTO(User user);
 }

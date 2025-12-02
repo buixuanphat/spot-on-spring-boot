@@ -1,6 +1,6 @@
 package com.buixuanphat.spot_on.enums;
 
-public enum OrganizerStatus {
+public enum Status {
     pending,
     verified,
     rejected

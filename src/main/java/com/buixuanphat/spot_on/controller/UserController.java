@@ -1,9 +1,7 @@
 package com.buixuanphat.spot_on.controller;
 
 import com.buixuanphat.spot_on.dto.ApiResponse;
-import com.buixuanphat.spot_on.dto.user.CreateCustomerRequestDTO;
-import com.buixuanphat.spot_on.dto.user.CreateUserRequestDTO;
-import com.buixuanphat.spot_on.dto.user.UserResponseDTO;
+import com.buixuanphat.spot_on.dto.user.*;
 import com.buixuanphat.spot_on.service.UserService;
 import jakarta.annotation.Nullable;
 import jakarta.validation.Valid;
@@ -27,44 +25,55 @@ public class UserController {
     @Value("${pagination.page-size}")
     @NonFinal
     int pageSize;
+
+
     @PostMapping("/users/register")
     ApiResponse<UserResponseDTO> register(@RequestBody @Valid CreateCustomerRequestDTO request)
     {
         return ApiResponse.<UserResponseDTO>builder()
-                .success(true)
-                .data(userService.createCustomer(request))
+                .data(userService.register(request))
                 .build();
     }
 
     @GetMapping("/users")
-    ApiResponse<Page<UserResponseDTO>>  getUsers(@RequestParam @Nullable String email, @RequestParam(defaultValue = "0") int page)
+    ApiResponse<Page<UserResponseDTO>>  getUsers(@RequestParam(required = false) Integer id ,@RequestParam(required = false) String email, @RequestParam(defaultValue = "0") int page)
     {
-
         return ApiResponse.<Page<UserResponseDTO>>builder()
-                .success(true)
-                .data(userService.getUsers(email, page, pageSize))
+                .data(userService.getUsers(id, email, page, pageSize))
                 .build();
 
     }
 
-
-    @PatchMapping(value = "/users/{userId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    ApiResponse<UserResponseDTO> updateAvatar(@PathVariable int userId, @Nullable @RequestParam("avatar") MultipartFile avatar)
+    @GetMapping("/users/{id}")
+    ApiResponse<UserResponseDTO> getUser (@PathVariable Integer id)
     {
         return ApiResponse.<UserResponseDTO>builder()
-                .success(true)
-                .data(userService.updateAvatar(userId, avatar))
+                .data(userService.getUser(id))
                 .build();
     }
 
 
-    @PostMapping(value = "/users", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    ApiResponse<UserResponseDTO> createUser(@Valid @ModelAttribute CreateUserRequestDTO request,
-                                            @RequestParam MultipartFile file)
+    @PostMapping(value = "/users/staff", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    ApiResponse<UserResponseDTO> createUser(@Valid @ModelAttribute CreateStaffRequestDTO request)
     {
         return ApiResponse.<UserResponseDTO>builder()
-                .success(true)
-                .data(userService.createUser(request,file))
+                .data(userService.createStaff(request))
+                .build();
+    }
+
+    @PostMapping(value = "/users/user-organizer", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    ApiResponse<UserResponseDTO> createOrganizerUser(@Valid @ModelAttribute CreateOrganizerUserRequestDTO request)
+    {
+        return ApiResponse.<UserResponseDTO>builder()
+                .data(userService.createOrganizerUser(request))
+                .build();
+    }
+
+    @PatchMapping(value = "/users/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    ApiResponse<UserResponseDTO> update( @Valid @PathVariable(value = "id") int id ,@Valid @ModelAttribute UpdateUserRequestDTO request)
+    {
+        return ApiResponse.<UserResponseDTO>builder()
+                .data(userService.update(id , request))
                 .build();
     }
 

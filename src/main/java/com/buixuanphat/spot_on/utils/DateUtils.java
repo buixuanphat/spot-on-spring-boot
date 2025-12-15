@@ -22,7 +22,7 @@ public class DateUtils {
         }
         catch (Exception e)
         {
-            System.err.println(e.getMessage());
+            log.error(e.getMessage());
             return null;
         }
     }
@@ -35,7 +35,7 @@ public class DateUtils {
         }
         catch (Exception e)
         {
-            System.err.println(e.getMessage());
+            log.error(e.getMessage());
             return null;
         }
     }
@@ -45,7 +45,7 @@ public class DateUtils {
             LocalDate ldt = LocalDate.ofInstant(instant, ZoneId.systemDefault());
             return localDateToString(ldt);
         } catch (Exception e) {
-            System.err.println(e.getMessage());
+            log.error(e.getMessage());
             return null;
         }
     }

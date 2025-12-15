@@ -19,7 +19,10 @@ public class CreateEventDTO {
     String startTime;
     String endTime;
     @Size(min = 3, max = 100, message = "Địa chỉ phải lớn hơn 3 kí tự và bé hơn 100 kí tự")
-    String location;
+    String address;
+    String province;
+    String district;
+    String ward;
     @Size(min = 3, max = 100, message = "Mô tả phải lớn hơn 3 kí tự và bé hơn 100 kí tự")
     String description;
     Integer organizerId;

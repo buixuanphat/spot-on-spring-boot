@@ -35,12 +35,13 @@ public class MerchandiseController {
     }
 
     @GetMapping("/merchandises")
-    ApiResponse<Page<MerchandiseResponseDTO>> getMerchandises(@RequestParam @Nullable Integer organizerId,
+    ApiResponse<Page<MerchandiseResponseDTO>> getMerchandises(@RequestParam @Nullable Integer id,
                                                               @RequestParam @Nullable String name,
+                                                              @RequestParam @Nullable Integer organizerId,
                                                               @RequestParam (defaultValue = "0") int page)
     {
         return ApiResponse.<Page<MerchandiseResponseDTO>>builder()
-                .data(merchandiseService.getMerchandises(organizerId, name, page, size))
+                .data(merchandiseService.getMerchandises(id, name, organizerId ,page, size))
                 .build();
     }
 

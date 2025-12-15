@@ -1,44 +1,43 @@
 package com.buixuanphat.spot_on.entity;
 
 import jakarta.persistence.*;
+import lombok.*;
+import lombok.experimental.FieldDefaults;
+import org.hibernate.annotations.ColumnDefault;
+
+import java.time.Instant;
 
 @Entity
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class Invoice {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
-    private Integer id;
+    Integer id;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "userId", nullable = false)
-    private User user;
+    User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "voucherId")
-    private Voucher voucher;
+    Voucher voucher;
 
-    public Integer getId() {
-        return id;
-    }
+    @Column(name = "purchase_time")
+    Instant purchaseTime;
 
-    public void setId(Integer id) {
-        this.id = id;
-    }
+    @Column(name = "status")
+    String status;
 
-    public User getUser() {
-        return user;
-    }
+    @Column(name = "total_payment")
+    Double totalPayment;
 
-    public void setUser(User user) {
-        this.user = user;
-    }
-
-    public Voucher getVoucher() {
-        return voucher;
-    }
-
-    public void setVoucher(Voucher voucher) {
-        this.voucher = voucher;
-    }
+    @ColumnDefault("CURRENT_TIMESTAMP")
+    @Column(name = "createdDate", nullable = false)
+    Instant createdDate;
 
 }

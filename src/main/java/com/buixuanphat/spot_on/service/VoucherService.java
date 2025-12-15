@@ -16,8 +16,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
-@FieldDefaults(level = AccessLevel.PRIVATE,makeFinal = true)
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @RequiredArgsConstructor
 public class VoucherService {
 
@@ -28,15 +30,15 @@ public class VoucherService {
     VoucherMapper voucherMapper;
 
     @PreAuthorize("hasAuthority('SCOPE_organizer')")
-    public VoucherResponseDTO create (CreateVoucherDTO request) {
-        if(voucherRepository.existsByCode(request.getCode())) {
+    public VoucherResponseDTO create(CreateVoucherDTO request) {
+        if (voucherRepository.existsByCode(request.getCode())) {
             throw new AppException(HttpStatus.CONFLICT.value(), "Mã đã tồn tại");
         }
 
         Voucher voucher = Voucher.builder()
                 .code(request.getCode())
                 .description(request.getDescription())
-                .organizer(organizerRepository.findById(request.getOrganizerId()).orElseThrow(()->new AppException(HttpStatus.NOT_FOUND.value(), "Ban tổ chức không tồn tại")))
+                .organizer(organizerRepository.findById(request.getOrganizerId()).orElseThrow(() -> new AppException(HttpStatus.NOT_FOUND.value(), "Ban tổ chức không tồn tại")))
                 .effectiveDate(DateUtils.stringToInstant(request.getEffectiveDate()))
                 .expirationDate(DateUtils.stringToInstant(request.getExpirationDate()))
                 .limitUsed(request.getLimitUsed())
@@ -49,6 +51,35 @@ public class VoucherService {
         response.setExpirationDate(DateUtils.instantToString(voucher.getExpirationDate()));
         response.setOrganizerId(voucher.getOrganizer().getId());
         return response;
+    }
+
+
+    public List<VoucherResponseDTO> getVouchersByOrganizer(int organizerId, String code) {
+        List<Voucher> vouchers;
+        if (code != null) {
+            vouchers = voucherRepository.findAllByCodeContainingIgnoreCaseAndOrganizer_Id(code, organizerId).orElseThrow(
+                    () -> new AppException(HttpStatus.NOT_FOUND.value(), "Không tìm thấy voucher"));
+        } else {
+            vouchers = voucherRepository.findAllByOrganizer_Id(organizerId).orElseThrow(
+                    () -> new AppException(HttpStatus.NOT_FOUND.value(), "Không tìm thấy voucher"));
+        }
+
+
+        return vouchers.stream().map(v ->
+        {
+            VoucherResponseDTO response = voucherMapper.toVoucherDTO(v);
+            response.setEffectiveDate(DateUtils.instantToString(v.getEffectiveDate()));
+            response.setExpirationDate(DateUtils.instantToString(v.getExpirationDate()));
+            return response;
+        }).toList();
+
+    }
+
+
+    public String delete(int id) {
+        voucherRepository.findById(id).orElseThrow(() -> new AppException(HttpStatus.NOT_FOUND.value(), "Không tìm thấy mã giảm giá"));
+        voucherRepository.deleteById(id);
+        return "Đã xóa thành công";
     }
 
 }

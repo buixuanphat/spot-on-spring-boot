@@ -47,12 +47,18 @@ public class EventController {
                 .build();
     }
 
+    @GetMapping("/events/{id}")
+    ApiResponse<EventResponseDTO> getEvent(@PathVariable Integer id){
+        return ApiResponse.<EventResponseDTO>builder()
+                .data(eventService.getEvent(id))
+                .build();
+    }
 
     @GetMapping("/events")
-    ApiResponse<Page<EventResponseDTO>> getEvents(@RequestParam @Nullable Integer id, @RequestParam @Nullable String name, @RequestParam String status ,@RequestParam @Nullable Boolean active, @RequestParam(defaultValue = "0") Integer page)
+    ApiResponse<Page<EventResponseDTO>> getEvents(@RequestParam @Nullable Integer organizerId , @RequestParam @Nullable Integer id, @RequestParam @Nullable String name, @RequestParam @Nullable String status , @RequestParam(defaultValue = "0") Integer page)
     {
         return ApiResponse.<Page<EventResponseDTO>>builder()
-                .data(eventService.getEvents(id, name,status ,active, page ,pageSize))
+                .data(eventService.getEvents(organizerId , id, name,status , page ,pageSize))
                 .build();
     }
 

@@ -8,6 +8,7 @@ import com.buixuanphat.spot_on.entity.Organizer;
 import com.buixuanphat.spot_on.enums.Status;
 import com.buixuanphat.spot_on.exception.AppException;
 import com.buixuanphat.spot_on.mapper.EventMapper;
+import com.buixuanphat.spot_on.mapper.OrganizerMapper;
 import com.buixuanphat.spot_on.repository.EventRepository;
 import com.buixuanphat.spot_on.repository.OrganizerRepository;
 import com.buixuanphat.spot_on.utils.DateUtils;
@@ -41,8 +42,9 @@ public class EventService {
 
     EventMapper eventMapper;
 
+    OrganizerMapper organizerMapper;
 
-    @Transactional
+
     @PreAuthorize("hasAuthority('SCOPE_organizer')")
     public EventResponseDTO register(CreateEventDTO request) {
 
@@ -57,10 +59,13 @@ public class EventService {
 
         Event event = Event.builder()
                 .name(request.getName())
-                .location(request.getLocation())
+                .address(request.getAddress())
+                .province(request.getProvince())
+                .district(request.getDistrict())
+                .ward(request.getWard())
                 .description(request.getDescription())
                 .ageLimit(request.getAgeLimit())
-                .active(false)
+                .active(true)
                 .status(Status.pending.name())
                 .createdDate(Instant.now())
                 .startTime(DateUtils.stringToInstant(request.getStartTime()))
@@ -83,12 +88,7 @@ public class EventService {
 
     @PreAuthorize("hasAnyAuthority('SCOPE_admin', 'SCOPE_staff')")
     public EventResponseDTO verify(int eventId, boolean accept) {
-        Event event;
-        try {
-            event = eventRepository.getReferenceById(eventId);
-        } catch (Exception e) {
-            throw new AppException(HttpStatus.NOT_FOUND.value(), "Sự kiện không tồn tại");
-        }
+        Event event = eventRepository.findById(eventId).orElseThrow(()->new AppException(HttpStatus.NOT_FOUND.value(), "Không tìm thấy sự kiện"));
         if (accept) {
             event.setStatus(Status.verified.name());
         } else {
@@ -100,16 +100,28 @@ public class EventService {
         return response;
     }
 
+    public EventResponseDTO getEvent(int id)
+    {
+        Event event = eventRepository.findById(id).orElseThrow(()->new AppException(HttpStatus.NOT_FOUND.value(), "Không tìm thấy sự kiện"));
+
+        EventResponseDTO response = eventMapper.toEventResponseDTO(event);
+        toResponse(response, event);
+        return response;
+    }
 
 
-    @PreAuthorize("hasAnyAuthority('SCOPE_admin', 'SCOPE_staff', 'SCOPE_organizer')")
-    public Page<EventResponseDTO> getEvents (Integer id, String name, String status ,Boolean active ,int page, int size)
+
+    public Page<EventResponseDTO> getEvents ( Integer organizerId ,Integer id, String name, String status ,int page, int size)
     {
         Pageable pageable = PageRequest.of(page, size);
 
         Specification<Event> specification = (root, query, cb) ->
         {
             List<Predicate> predicates = new ArrayList<>();
+            if(organizerId != null)
+            {
+                predicates.add(cb.equal(root.get("organizer").get("id"), organizerId));
+            }
             if(id != null) {
                 predicates.add(cb.equal(root.get("id"), id));
             }
@@ -119,9 +131,7 @@ public class EventService {
             if (status != null) {
                 predicates.add(cb.equal(cb.lower(root.get("status")), status.toLowerCase() ));
             }
-            if (active != null) {
-                predicates.add(cb.equal(root.get("active"), active));
-            }
+            predicates.add(cb.equal(root.get("active"), true));
 
             return cb.and(predicates.toArray(new Predicate[0]));
         };
@@ -129,11 +139,8 @@ public class EventService {
         return eventRepository.findAll(specification, pageable).map(e ->
         {
             EventResponseDTO response = eventMapper.toEventResponseDTO(e);
-            response.setCreatedDate(DateUtils.instantToString(e.getCreatedDate()));
-            response.setStartTime(DateUtils.instantToString(e.getStartTime()));
-            response.setEndTime(DateUtils.instantToString(e.getEndTime()));
-            response.setOrganizerId(e.getOrganizer().getId());
-            return  response;
+            toResponse(response, e);
+            return response;
         });
     }
 
@@ -141,8 +148,12 @@ public class EventService {
     void toResponse(EventResponseDTO response, Event event) {
         response.setStartTime(DateUtils.instantToString(event.getStartTime()));
         response.setEndTime(DateUtils.instantToString(event.getEndTime()));
-        response.setCreatedDate(DateUtils.instantToString(event.getCreatedDate()));;
-        response.setOrganizerId(event.getOrganizer().getId());
+        response.setCreatedDate(DateUtils.instantToString(event.getCreatedDate()));
+
+        OrganizerResponseDTO organizer = organizerMapper.toOrganizerResponseDTO(event.getOrganizer());
+        organizer.setCreatedDate(DateUtils.instantToString(event.getOrganizer().getCreatedDate()));
+
+        response.setOrganizer(organizer);
     }
 
 }

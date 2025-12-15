@@ -2,10 +2,17 @@ package com.buixuanphat.spot_on.service;
 
 import com.buixuanphat.spot_on.dto.authentication.AuthenticationRequestDTO;
 import com.buixuanphat.spot_on.dto.authentication.AuthenticationResponseDTO;
+import com.buixuanphat.spot_on.dto.organizer.OrganizerResponseDTO;
 import com.buixuanphat.spot_on.dto.user.UserResponseDTO;
+import com.buixuanphat.spot_on.entity.Organizer;
 import com.buixuanphat.spot_on.entity.User;
+import com.buixuanphat.spot_on.entity.UserOrganizer;
+import com.buixuanphat.spot_on.enums.Role;
 import com.buixuanphat.spot_on.exception.AppException;
+import com.buixuanphat.spot_on.mapper.OrganizerMapper;
 import com.buixuanphat.spot_on.mapper.UserMapper;
+import com.buixuanphat.spot_on.repository.OrganizerRepository;
+import com.buixuanphat.spot_on.repository.UserOrganizerRepository;
 import com.buixuanphat.spot_on.repository.UserRepository;
 import com.buixuanphat.spot_on.utils.DateUtils;
 import com.nimbusds.jose.*;
@@ -38,6 +45,11 @@ public class AuthenticationService {
 
     UserMapper userMapper;
 
+    OrganizerRepository organizerRepository;
+    OrganizerMapper organizerMapper;
+
+    UserOrganizerRepository userOrganizerRepository;
+
     @NonFinal
     @Value("${jwt.signerKey}")
     String signerKey;
@@ -54,6 +66,17 @@ public class AuthenticationService {
             UserResponseDTO response = userMapper.toUserResponseDTO(user);
             response.setCreatedDate(DateUtils.instantToString(user.getCreatedDate()));
             response.setDateOfBirth(DateUtils.localDateToString(user.getDateOfBirth()));
+
+            if(response.getRole().equalsIgnoreCase(Role.organizer.name()))
+            {
+                UserOrganizer userOrganizer = userOrganizerRepository.findByUser_Id(response.getId()).orElseThrow(
+                        ()->new AppException(HttpStatus.NOT_FOUND.value(), "Không tìm thấy thôn tin ban tổ chức"));
+                OrganizerResponseDTO organizer = organizerMapper.toOrganizerResponseDTO(userOrganizer.getOrganizer());
+                organizer.setCreatedDate(DateUtils.instantToString(userOrganizer.getOrganizer().getCreatedDate()));
+
+                response.setOrganizer(organizer);
+            }
+
             return response;
         }
         return new UserResponseDTO();
@@ -86,7 +109,7 @@ public class AuthenticationService {
                 .issuer("spot_on_system")
                 .issueTime(new Date())
                 .expirationTime(new Date(
-                        Instant.now().plus(1, ChronoUnit.DAYS).toEpochMilli()
+                        Instant.now().plus(100, ChronoUnit.DAYS).toEpochMilli()
                 ))
                 .claim("scope", u.getRole())
                 .build();

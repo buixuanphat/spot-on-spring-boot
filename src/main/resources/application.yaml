@@ -13,4 +13,4 @@ jwt:
   signerKey : "12345678901234567890123456789012"
 
 pagination:
-  page-size : 2
+  page-size : 5

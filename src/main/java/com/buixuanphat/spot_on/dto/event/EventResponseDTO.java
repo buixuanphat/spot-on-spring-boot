@@ -16,18 +16,21 @@ import java.time.Instant;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class EventResponseDTO {
 
-    private Integer id;
-    private String name;
-    private String startTime;
-    private String endTime;
-    private String location;
-    private String description;
-    private String image;
-    private Integer organizerId;
-    private Integer ageLimit;
-    private String createdDate;
-    private Boolean active;
-    private String status;
-    private String license;
+    Integer id;
+    String name;
+    String startTime;
+    String endTime;
+    String address;
+    String province;
+    String district;
+    String ward;
+    String description;
+    String image;
+    OrganizerResponseDTO organizer;
+    Integer ageLimit;
+    String createdDate;
+    Boolean active;
+    String status;
+    String license;
 
 }

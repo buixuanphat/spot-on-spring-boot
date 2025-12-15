@@ -50,7 +50,7 @@ public class MerchandiseService {
                 .build();
 
         Map<String, String> uploadImage = cloudinaryService.uploadImage(request.getImage());
-        merchandise.setImage(uploadImage.get("image"));
+        merchandise.setImage(uploadImage.get("url"));
         merchandise.setImageId(uploadImage.get("id"));
 
         MerchandiseResponseDTO response = merchandiseMapper.toMerchandiseResponseDTO(merchandiseRepository.save(merchandise));
@@ -60,18 +60,22 @@ public class MerchandiseService {
     }
 
     @PreAuthorize("hasAnyAuthority('SCOPE_admin', 'SCOPE_organizer')")
-    public Page<MerchandiseResponseDTO> getMerchandises(@Nullable Integer organizerId,
+    public Page<MerchandiseResponseDTO> getMerchandises(@Nullable Integer id,
                                                         @Nullable String name,
+                                                        @Nullable Integer organizerId,
                                                         int page, int size) {
         Specification<Merchandise> specification = (root, query, cb) ->
         {
             List<Predicate> predicates = new ArrayList<>();
-            if (organizerId != null) {
-                Join<Merchandise ,Organizer> organizerJoin = root.join("organizer");
-                predicates.add(cb.equal(organizerJoin.get("organizer").get("id"), organizerId));
+            if (id != null) {
+                predicates.add(cb.equal(root.get("id"), id));
             }
             if (name != null) {
                 predicates.add(cb.like(root.get("name"), "%" + name + "%"));
+            }
+            if(organizerId != null){
+                Join<Merchandise, Organizer> organizerJoin = root.join("organizer");
+                predicates.add(cb.equal(organizerJoin.get("id"), organizerId));
             }
             return query.where(predicates.toArray(new Predicate[0])).getRestriction();
         };

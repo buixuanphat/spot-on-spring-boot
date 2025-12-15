@@ -57,7 +57,7 @@ public class CloudinaryService {
         }
     }
 
-    public Map uploadImage(MultipartFile image) {
+    public Map<String, String> uploadImage(MultipartFile image) {
         try {
             Map uploadResult = cloudinary.uploader().upload(
                     image.getBytes(),
@@ -95,8 +95,6 @@ public class CloudinaryService {
             throw new RuntimeException("Lỗi khi xoá ảnh: " + e.getMessage());
         }
     }
-
-
 
 
 

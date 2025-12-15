@@ -28,8 +28,8 @@ public class Event {
     @Column(name = "end_time", nullable = false)
     private Instant endTime;
 
-    @Column(name = "location", nullable = false)
-    private String location;
+    @Column(name = "address", nullable = false)
+    private String address;
 
     @Lob
     @Column(name = "description", nullable = false)
@@ -64,4 +64,15 @@ public class Event {
 
     @Column(name = "license_id")
     String licenseId;
+
+    @Column(name = "province")
+    private String province;
+
+    @Column(name = "district")
+    private String district;
+
+    @Column(name = "ward")
+    private String ward;
+
+
 }

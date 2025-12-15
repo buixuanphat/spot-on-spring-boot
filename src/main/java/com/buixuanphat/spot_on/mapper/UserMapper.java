@@ -14,5 +14,6 @@ public interface UserMapper {
 
     @Mapping(target = "dateOfBirth", ignore = true)
     @Mapping(target = "createdDate", ignore = true)
+    @Mapping(target = "organizer", ignore = true)
     UserResponseDTO toUserResponseDTO(User user);
 }

@@ -21,16 +21,24 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class MerchandiseController {
 
-    MerchandiseService  merchandiseService;
+    MerchandiseService merchandiseService;
 
     @NonFinal
     @Value("${pagination.page-size}")
     int size;
 
     @PostMapping("/merchandises")
-    ApiResponse<MerchandiseResponseDTO> create(@Valid @ModelAttribute CreateMerchandiseDTO request){
+    ApiResponse<MerchandiseResponseDTO> create(@Valid @ModelAttribute CreateMerchandiseDTO request) {
         return ApiResponse.<MerchandiseResponseDTO>builder()
                 .data(merchandiseService.create(request))
+                .build();
+    }
+
+
+    @PatchMapping ("/merchandises/{id}")
+    ApiResponse<MerchandiseResponseDTO> update( @PathVariable int id ,@Valid @ModelAttribute CreateMerchandiseDTO request) {
+        return ApiResponse.<MerchandiseResponseDTO>builder()
+                .data(merchandiseService.update(id, request))
                 .build();
     }
 
@@ -38,12 +46,18 @@ public class MerchandiseController {
     ApiResponse<Page<MerchandiseResponseDTO>> getMerchandises(@RequestParam @Nullable Integer id,
                                                               @RequestParam @Nullable String name,
                                                               @RequestParam @Nullable Integer organizerId,
-                                                              @RequestParam (defaultValue = "0") int page)
-    {
+                                                              @RequestParam(defaultValue = "0") int page) {
         return ApiResponse.<Page<MerchandiseResponseDTO>>builder()
-                .data(merchandiseService.getMerchandises(id, name, organizerId ,page, size))
+                .data(merchandiseService.getMerchandises(id, name, organizerId, page, size))
                 .build();
     }
 
+
+    @GetMapping("/merchandises/{id}")
+    ApiResponse<MerchandiseResponseDTO> getMerchandise(@PathVariable Integer id) {
+        return ApiResponse.<MerchandiseResponseDTO>builder()
+                .data(merchandiseService.getMerchandise(id))
+                .build();
+    }
 
 }

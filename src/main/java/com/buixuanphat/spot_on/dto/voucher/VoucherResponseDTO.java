@@ -22,4 +22,5 @@ public class VoucherResponseDTO {
     Integer limitUsed;
     String type;
     Double value;
+    String tier;
 }

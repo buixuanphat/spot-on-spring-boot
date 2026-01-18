@@ -37,12 +37,16 @@ public class SecurityConfig {
                 "/users/register",
                 "/auth/log-in",
                 "/organizers/register",
+                "/vnpay/ipn",
+                "/events",
+                "/vnpay/return"
         };
 
         http.csrf(AbstractHttpConfigurer::disable)
                 .cors(Customizer.withDefaults())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.POST, permitAll).permitAll()
+                        .requestMatchers(HttpMethod.GET, permitAll).permitAll()
                         .anyRequest().authenticated()
                 )
                 .oauth2ResourceServer(oauth2 ->

@@ -3,6 +3,8 @@ package com.buixuanphat.spot_on.controller;
 import com.buixuanphat.spot_on.dto.ApiResponse;
 import com.buixuanphat.spot_on.dto.organizer.OrganizerCreateRequestDTO;
 import com.buixuanphat.spot_on.dto.organizer.OrganizerResponseDTO;
+import com.buixuanphat.spot_on.dto.stats.AdminPaymentStat;
+import com.buixuanphat.spot_on.dto.stats.AdminTicketStat;
 import com.buixuanphat.spot_on.dto.user.UserResponseDTO;
 import com.buixuanphat.spot_on.service.OrganizerService;
 import jakarta.annotation.Nullable;
@@ -68,6 +70,34 @@ public class OrganizerController {
     {
         return ApiResponse.<UserResponseDTO>builder()
                 .data(organizerService.verify(organizerId, accept))
+                .build();
+    }
+
+
+    @PatchMapping("/organizers/{organizerId}")
+    ApiResponse<OrganizerResponseDTO> update(@PathVariable("organizerId") int organizerId, @Valid @ModelAttribute OrganizerCreateRequestDTO request)
+    {
+        return ApiResponse.<OrganizerResponseDTO>builder()
+                .data(organizerService.updateOrganizer(organizerId, request))
+                .build();
+    }
+
+
+    @GetMapping("/organizer/stats/payment")
+    ApiResponse<List<AdminPaymentStat>> getOrganizerPaymentStat(@RequestParam int month, @RequestParam int year)
+    {
+        return ApiResponse.<List<AdminPaymentStat>>builder()
+                .data(organizerService.getOrganizerPaymentStat(month, year))
+                .build();
+    }
+
+
+
+    @GetMapping("/organizer/stats/ticket")
+    ApiResponse<List<AdminTicketStat>> getOrganizerTicketStat(@RequestParam int month, @RequestParam int year)
+    {
+        return ApiResponse.<List<AdminTicketStat>>builder()
+                .data(organizerService.getOrganizerTicketStat(month, year))
                 .build();
     }
 

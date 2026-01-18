@@ -32,8 +32,6 @@ public class Ticket {
     @Column(name = "status", nullable = false)
     String status;
 
-
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "invoiceId")
     Invoice invoice;

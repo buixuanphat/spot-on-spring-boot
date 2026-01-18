@@ -1,5 +1,7 @@
 package com.buixuanphat.spot_on.dto.invoice;
 
+import com.buixuanphat.spot_on.dto.merchandise.CreateMerchandiseDTO;
+import com.buixuanphat.spot_on.dto.merchandise.MerchandiseResponseDTO;
 import com.buixuanphat.spot_on.dto.ticket.CreateTicketRequestDTO;
 import com.buixuanphat.spot_on.dto.voucher.VoucherResponseDTO;
 import com.buixuanphat.spot_on.entity.User;
@@ -23,6 +25,9 @@ public class CreateInvoiceRequestDTO {
     Integer voucherId;
     List<CreateTicketRequestDTO> tickets;
     Double totalPayment;
+    List<MerchandiseResponseDTO> merchandises;
+    int eventId;
+    Integer coins;
 
     //double totalPayment;
     //Instant purchaseTime;

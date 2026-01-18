@@ -12,7 +12,8 @@ import lombok.experimental.FieldDefaults;
 public class CreateTicketRequestDTO {
 
 
-    int sectionId;
+    int id;
+    int amount;
 
     //Invoice invoiceId;
     //Instant createdDate;

@@ -6,6 +6,8 @@ import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
 
 import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalTime;
 
 @Entity
 @Getter
@@ -23,10 +25,13 @@ public class Event {
     private String name;
 
     @Column(name = "start_time", nullable = false)
-    private Instant startTime;
+    private LocalTime startTime;
 
     @Column(name = "end_time", nullable = false)
-    private Instant endTime;
+    private LocalTime endTime;
+
+    @Column(name = "date", nullable = false)
+    private LocalDate date;
 
     @Column(name = "address", nullable = false)
     private String address;
@@ -73,6 +78,10 @@ public class Event {
 
     @Column(name = "ward")
     private String ward;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "genre_id")
+    private Genre genre;
 
 
 }

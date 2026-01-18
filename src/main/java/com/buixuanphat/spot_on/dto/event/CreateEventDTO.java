@@ -18,12 +18,12 @@ public class CreateEventDTO {
     String name;
     String startTime;
     String endTime;
+    String date;
     @Size(min = 3, max = 100, message = "Địa chỉ phải lớn hơn 3 kí tự và bé hơn 100 kí tự")
     String address;
     String province;
     String district;
     String ward;
-    @Size(min = 3, max = 100, message = "Mô tả phải lớn hơn 3 kí tự và bé hơn 100 kí tự")
     String description;
     Integer organizerId;
     @Min(value = 6, message = "Độ tuổi giới hạn phải từ 6 đến 18 tuổi")
@@ -31,5 +31,6 @@ public class CreateEventDTO {
     Integer ageLimit;
     MultipartFile image;
     MultipartFile license;
+    int genreId;
 
 }

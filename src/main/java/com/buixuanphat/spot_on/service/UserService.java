@@ -11,8 +11,6 @@ import com.buixuanphat.spot_on.repository.OrganizerRepository;
 import com.buixuanphat.spot_on.repository.UserOrganizerRepository;
 import com.buixuanphat.spot_on.repository.UserRepository;
 import com.buixuanphat.spot_on.utils.DateUtils;
-import jakarta.annotation.Nullable;
-import jakarta.persistence.EntityNotFoundException;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
@@ -28,7 +26,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.time.Instant;
 import java.util.ArrayList;
@@ -60,7 +57,6 @@ public class UserService {
         }
 
         User user = userMapper.toUser(request);
-        user.setDateOfBirth(DateUtils.stringtoLocalDate(request.getDateOfBirth()));
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setActive(true);
         user.setCreatedDate(Instant.now());
@@ -69,8 +65,7 @@ public class UserService {
         user.setCoins(0);
 
         UserResponseDTO response = userMapper.toUserResponseDTO(userRepository.save(user));
-        response.setDateOfBirth(DateUtils.localDateToString(user.getDateOfBirth()));
-        response.setCreatedDate(DateUtils.localDateToString(user.getDateOfBirth()));
+        response.setCreatedDate(DateUtils.instantToString(user.getCreatedDate()));
 
         return response;
     }
@@ -97,7 +92,6 @@ public class UserService {
         return userRepository.findAll(specification, pageable).map(u ->
         {
             UserResponseDTO response = userMapper.toUserResponseDTO(u);
-            response.setDateOfBirth(DateUtils.localDateToString(u.getDateOfBirth()));
             response.setCreatedDate(DateUtils.instantToString(u.getCreatedDate()));
             return response;
         });
@@ -105,20 +99,21 @@ public class UserService {
 
     @PreAuthorize("hasAuthority('SCOPE_admin')")
     public UserResponseDTO getUser(Integer id) {
-        User user = userRepository.findById(id).orElseThrow(() -> new AppException(HttpStatus.NOT_FOUND.value(), "Không tìm thấy thông tin người dùng"));
+        User user = userRepository.findByIdAndActive(id, true).orElseThrow(() -> new AppException(HttpStatus.NOT_FOUND.value(), "Không tìm thấy thông tin người dùng"));
         UserResponseDTO response = userMapper.toUserResponseDTO(user);
-        response.setDateOfBirth(DateUtils.localDateToString(user.getDateOfBirth()));
         response.setCreatedDate(DateUtils.instantToString(user.getCreatedDate()));
         return response;
     }
 
 
     @PreAuthorize("hasAuthority('SCOPE_admin')")
-    public UserResponseDTO createStaff(CreateStaffRequestDTO request) {
+    public UserResponseDTO createUser(CreateUserRequestDTO request) {
         if (userRepository.existsByEmail(request.getEmail())) {
             throw new AppException(HttpStatus.CONFLICT.value(), "Email đã được sử dụng");
         }
         User user = User.builder()
+                .firstname(request.getFirstname())
+                .lastname(request.getLastname())
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
                 .active(true)
@@ -180,22 +175,51 @@ public class UserService {
         if(request.getEmail() != null) user.setEmail(request.getEmail());
         if(request.getPassword() != null) user.setPassword(request.getPassword());
         if(request.getRole() != null) user.setRole(request.getRole());
-        if(request.getDateOfBirth() != null) user.setDateOfBirth(DateUtils.stringtoLocalDate(request.getDateOfBirth()));
         if(request.getCoins() != null) user.setCoins(request.getCoins());
         if(request.getTier() != null) user.setTier(request.getTier());
         if(request.getActive() != null) user.setActive(request.getActive());
         if(request.getPassword() != null) user.setPassword(passwordEncoder.encode(request.getPassword()));
-        if(request.getAvatar() != null)
+        if(request.getAvatar() != null )
         {
-            cloudinaryService.deleteImage(user.getAvatarId());
+            if(user.getAvatar() != null && !user.getAvatar().isEmpty() && !user.getAvatar().isBlank())
+            {
+                cloudinaryService.deleteImage(user.getAvatarId());
+            }
             Map<String, String> upload = cloudinaryService.uploadImage(request.getAvatar());
             user.setAvatar(upload.get("url"));
             user.setAvatarId(upload.get("id"));
         }
         UserResponseDTO response = userMapper.toUserResponseDTO(userRepository.save(user));
         response.setCreatedDate(DateUtils.instantToString(user.getCreatedDate()));
-        response.setDateOfBirth(DateUtils.localDateToString(user.getDateOfBirth()));
         return response;
     }
+
+
+    public String disable(int id)
+    {
+        User user = userRepository.findById(id).orElseThrow(()->new AppException(HttpStatus.NOT_FOUND.value(), "Người dùng không tồn tại"));
+        user.setActive(false);
+        userRepository.save(user);
+        return "Đã xóa thành công";
+    }
+
+
+
+    UserPublicInfoResponseDTO convertToUserDTO(int userId)
+    {
+        User user = userRepository.findById(userId).orElseThrow(()->new AppException(HttpStatus.NOT_FOUND.value(), "Không tìm thấy người dùng"));
+
+        return UserPublicInfoResponseDTO
+                .builder()
+                .id(user.getId())
+                .firstname(user.getFirstname())
+                .lastname(user.getLastname())
+                .avatar(user.getAvatar())
+                .role(user.getRole())
+                .createdDate(DateUtils.instantToString(user.getCreatedDate()))
+                .active(user.getActive())
+                .build();
+    }
+
 
 }

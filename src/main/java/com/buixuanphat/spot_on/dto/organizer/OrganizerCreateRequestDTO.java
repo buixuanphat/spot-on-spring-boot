@@ -32,9 +32,10 @@ public class OrganizerCreateRequestDTO {
     String phoneNumber;
     @Size(min = 3, max = 100, message = "Địa chỉ phải lớn hơn 3 kí tự và bé hơn 100 kí tự")
     String address;
-    @Size(min = 3,max = 100, message = "Mô tả phải lớn hơn 3 kí tự và bé hơn 100 kí tự")
+    @Size(min = 3,max = 500, message = "Mô tả phải lớn hơn 3 kí tự và bé hơn 500 kí tự")
     String description;
     MultipartFile avatar;
     MultipartFile license;
+    String status;
 
 }

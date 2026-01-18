@@ -1,0 +1,13 @@
+package com.buixuanphat.spot_on.repository;
+
+import com.buixuanphat.spot_on.entity.Evaluation;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+
+import java.util.List;
+
+public interface EvaluationRepository extends JpaRepository<Evaluation,Long>, JpaSpecificationExecutor<Evaluation> {
+    List<Evaluation> findAllByUser_IdAndEvent_Id(int userId, Integer id);
+
+    List<Evaluation> findAllByUser_IdAndInvoice_Id(int userId, Integer id);
+}

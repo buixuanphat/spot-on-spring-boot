@@ -25,7 +25,6 @@ public class UpdateUserRequestDTO {
     String email;
     @Size(min = 8, max = 16, message = "Mật khẩu phải có độ dài từ 8 đến 16 kí tự")
     String password;
-    String dateOfBirth;
     MultipartFile avatar;
     Integer coins;
     String tier;

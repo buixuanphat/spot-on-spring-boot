@@ -9,7 +9,9 @@ import org.mapstruct.Mapping;
 public interface EventMapper {
     @Mapping(target = "startTime", ignore = true)
     @Mapping(target = "endTime", ignore = true)
+    @Mapping(target = "date", ignore = true)
     @Mapping(target = "createdDate", ignore = true)
     @Mapping(target = "organizer", ignore = true)
+    @Mapping(target = "genre", ignore = true)
     EventResponseDTO toEventResponseDTO(Event event);
 }

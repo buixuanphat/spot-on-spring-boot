@@ -1,13 +1,9 @@
 package com.buixuanphat.spot_on.dto.event;
 
+import com.buixuanphat.spot_on.dto.genre.GenreResponseDTO;
 import com.buixuanphat.spot_on.dto.organizer.OrganizerResponseDTO;
-import com.buixuanphat.spot_on.entity.Organizer;
-import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-import org.hibernate.annotations.ColumnDefault;
-
-import java.time.Instant;
 
 @Data
 @NoArgsConstructor
@@ -20,6 +16,7 @@ public class EventResponseDTO {
     String name;
     String startTime;
     String endTime;
+    String date;
     String address;
     String province;
     String district;
@@ -32,5 +29,5 @@ public class EventResponseDTO {
     Boolean active;
     String status;
     String license;
-
+    GenreResponseDTO genre;
 }

@@ -43,6 +43,9 @@ public class Voucher {
     @Column(name = "type", nullable = false)
     private String type;
 
+    @Column(name = "tier", nullable = false)
+    private String tier;
+
     @Column(name = "value", nullable = false)
     private Double value;
 

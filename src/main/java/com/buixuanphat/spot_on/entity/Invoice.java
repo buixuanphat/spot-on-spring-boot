@@ -36,8 +36,18 @@ public class Invoice {
     @Column(name = "total_payment")
     Double totalPayment;
 
+    @Column(name = "coins")
+    Integer coins;
+
+    @Column(name = "notification")
+    Integer notification;
+
     @ColumnDefault("CURRENT_TIMESTAMP")
     @Column(name = "createdDate", nullable = false)
     Instant createdDate;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "event_id")
+    Event event;
 
 }

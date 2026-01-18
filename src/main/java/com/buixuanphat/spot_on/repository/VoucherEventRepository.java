@@ -10,4 +10,6 @@ import java.util.List;
 @Repository
 public interface VoucherEventRepository extends JpaRepository<VoucherEvent,Integer> {
     List<VoucherEvent> findAllByEvent_Id(int eventId);
+
+    VoucherEvent findByEvent_IdAndVoucher_Code(int eventId, String code);
 }

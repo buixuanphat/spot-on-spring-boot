@@ -5,6 +5,7 @@ import com.buixuanphat.spot_on.dto.section.CreateSectionDTO;
 import com.buixuanphat.spot_on.dto.section.SectionResponseDTO;
 import com.buixuanphat.spot_on.service.SectionService;
 import jakarta.annotation.Nullable;
+import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -29,7 +30,7 @@ public class SectionController {
 
 
     @PostMapping("/sections")
-    ApiResponse<SectionResponseDTO> create(@RequestBody CreateSectionDTO request) {
+    ApiResponse<SectionResponseDTO> create(@Valid @RequestBody CreateSectionDTO request) {
         return ApiResponse.<SectionResponseDTO>builder()
                 .data(sectionService.createSection(request))
                 .build();
@@ -40,6 +41,14 @@ public class SectionController {
     ApiResponse<String> create(@PathVariable int id) {
         return ApiResponse.<String>builder()
                 .data(sectionService.delete(id))
+                .build();
+    }
+
+
+    @PatchMapping("/sections/{id}")
+    ApiResponse<SectionResponseDTO> update(@PathVariable int id, @Valid @RequestBody CreateSectionDTO request) {
+        return ApiResponse.<SectionResponseDTO>builder()
+                .data(sectionService.updateSection(id, request))
                 .build();
     }
 }

@@ -3,7 +3,6 @@ package com.buixuanphat.spot_on.controller;
 import com.buixuanphat.spot_on.dto.ApiResponse;
 import com.buixuanphat.spot_on.dto.user.*;
 import com.buixuanphat.spot_on.service.UserService;
-import jakarta.annotation.Nullable;
 import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -13,7 +12,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @FieldDefaults(level = AccessLevel.PRIVATE,makeFinal = true)
@@ -53,11 +51,11 @@ public class UserController {
     }
 
 
-    @PostMapping(value = "/users/staff", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    ApiResponse<UserResponseDTO> createUser(@Valid @ModelAttribute CreateStaffRequestDTO request)
+    @PostMapping(value = "/users", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    ApiResponse<UserResponseDTO> createUser(@Valid @ModelAttribute CreateUserRequestDTO request)
     {
         return ApiResponse.<UserResponseDTO>builder()
-                .data(userService.createStaff(request))
+                .data(userService.createUser(request))
                 .build();
     }
 
@@ -74,6 +72,15 @@ public class UserController {
     {
         return ApiResponse.<UserResponseDTO>builder()
                 .data(userService.update(id , request))
+                .build();
+    }
+
+
+    @PatchMapping("/users/disable/{id}")
+    ApiResponse<String> disable( @PathVariable(value = "id") int id)
+    {
+        return ApiResponse.<String>builder()
+                .data(userService.disable(id))
                 .build();
     }
 

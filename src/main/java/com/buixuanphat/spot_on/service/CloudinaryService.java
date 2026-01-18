@@ -19,17 +19,21 @@ public class CloudinaryService {
     Cloudinary cloudinary;
 
 
-    public Map uploadFile(MultipartFile file) {
+    public Map<String, String> uploadFile(MultipartFile file) {
         try {
+            String originalName = file.getOriginalFilename(); // abc.pdf
+
             Map uploadResult = cloudinary.uploader().upload(
                     file.getBytes(),
                     ObjectUtils.asMap(
+                            "resource_type", "image",
+                            "format", "pdf",
                             "folder", "file",
-                            "resource_type", "raw"
+                            "public_id", originalName
                     )
             );
 
-            Map<String, String> response = new HashMap();
+            Map<String, String> response = new HashMap<>();
             response.put("url", uploadResult.get("secure_url").toString());
             response.put("id", uploadResult.get("public_id").toString());
             return response;
@@ -37,6 +41,8 @@ public class CloudinaryService {
             throw new RuntimeException("Upload tệp thất bại: " + e.getMessage());
         }
     }
+
+
 
     public void deleteFile(String publicId) {
         try {
@@ -95,7 +101,6 @@ public class CloudinaryService {
             throw new RuntimeException("Lỗi khi xoá ảnh: " + e.getMessage());
         }
     }
-
 
 
 }

@@ -4,5 +4,8 @@ public enum Status {
     pending,
     verified,
     rejected,
-    running
+    running,
+    paid,
+    cancelled,
+    expired
 }

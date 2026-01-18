@@ -65,7 +65,6 @@ public class AuthenticationService {
         {
             UserResponseDTO response = userMapper.toUserResponseDTO(user);
             response.setCreatedDate(DateUtils.instantToString(user.getCreatedDate()));
-            response.setDateOfBirth(DateUtils.localDateToString(user.getDateOfBirth()));
 
             if(response.getRole().equalsIgnoreCase(Role.organizer.name()))
             {

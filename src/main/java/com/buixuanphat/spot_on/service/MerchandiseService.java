@@ -2,12 +2,17 @@ package com.buixuanphat.spot_on.service;
 
 import com.buixuanphat.spot_on.dto.merchandise.CreateMerchandiseDTO;
 import com.buixuanphat.spot_on.dto.merchandise.MerchandiseResponseDTO;
+import com.buixuanphat.spot_on.dto.organizer.OrganizerResponseDTO;
+import com.buixuanphat.spot_on.entity.InvoiceMerchandise;
 import com.buixuanphat.spot_on.entity.Merchandise;
 import com.buixuanphat.spot_on.entity.Organizer;
+import com.buixuanphat.spot_on.exception.AppException;
 import com.buixuanphat.spot_on.mapper.MerchandiseMapper;
 import com.buixuanphat.spot_on.mapper.OrganizerMapper;
+import com.buixuanphat.spot_on.repository.InvoiceMerchandiseRepository;
 import com.buixuanphat.spot_on.repository.MerchandiseRepository;
 import com.buixuanphat.spot_on.repository.OrganizerRepository;
+import com.buixuanphat.spot_on.utils.DateUtils;
 import jakarta.annotation.Nullable;
 import jakarta.persistence.criteria.*;
 import lombok.AccessLevel;
@@ -17,6 +22,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
@@ -40,6 +46,8 @@ public class MerchandiseService {
 
     OrganizerMapper organizerMapper;
 
+    InvoiceMerchandiseRepository invoiceMerchandiseRepository;
+
 
     @PreAuthorize("hasAuthority('SCOPE_organizer')")
     public MerchandiseResponseDTO create(CreateMerchandiseDTO request) {
@@ -58,6 +66,29 @@ public class MerchandiseService {
 
         return response;
     }
+
+
+    @PreAuthorize("hasAuthority('SCOPE_organizer')")
+    public MerchandiseResponseDTO update(int id ,CreateMerchandiseDTO request) {
+
+        Merchandise merchandise = merchandiseRepository.findById(id).orElseThrow(()->new AppException(HttpStatus.NOT_FOUND.value(), "Không tìm thấy đồ lưu niệm"));
+
+        merchandise.setName(request.getName());
+        merchandise.setPrice(request.getPrice());
+
+        if(request.getImage()!=null)
+        {
+            Map<String, String> uploadImage = cloudinaryService.uploadImage(request.getImage());
+            merchandise.setImage(uploadImage.get("url"));
+            merchandise.setImageId(uploadImage.get("id"));
+        }
+
+        MerchandiseResponseDTO response = merchandiseMapper.toMerchandiseResponseDTO(merchandiseRepository.save(merchandise));
+        response.setOrganizer(organizerMapper.toOrganizerResponseDTO(merchandise.getOrganizer()));
+
+        return response;
+    }
+
 
     @PreAuthorize("hasAnyAuthority('SCOPE_admin', 'SCOPE_organizer')")
     public Page<MerchandiseResponseDTO> getMerchandises(@Nullable Integer id,
@@ -89,4 +120,35 @@ public class MerchandiseService {
             return response;
         });
     }
+
+
+    public MerchandiseResponseDTO getMerchandise(int id)
+    {
+        Merchandise merchandise = merchandiseRepository.findById(id)
+                .orElseThrow(()->new AppException(HttpStatus.NOT_FOUND.value(), "Không tìm thấy đồ lưu niệm"));
+
+        Organizer organizer = merchandise.getOrganizer();
+        OrganizerResponseDTO organizerResponse = organizerMapper.toOrganizerResponseDTO(organizer);
+        organizerResponse.setCreatedDate(DateUtils.instantToString(organizer.getCreatedDate()));
+
+        MerchandiseResponseDTO response = merchandiseMapper.toMerchandiseResponseDTO(merchandise);
+        response.setOrganizer(organizerResponse);
+
+        return response;
+    }
+
+
+    public List<MerchandiseResponseDTO> getMerchandisesOfInvoice(int invoiceId)
+    {
+        List<InvoiceMerchandise> invoiceMerchandises = invoiceMerchandiseRepository.findAllByInvoice_Id(invoiceId);
+
+        List<MerchandiseResponseDTO> responses = new ArrayList<>();
+
+        invoiceMerchandises.forEach(m -> {
+            responses.add(merchandiseMapper.toMerchandiseResponseDTO(m.getMerchandise()));
+        });
+
+        return responses;
+    }
+
 }

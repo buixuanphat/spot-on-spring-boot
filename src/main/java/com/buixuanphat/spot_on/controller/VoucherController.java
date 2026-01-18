@@ -35,4 +35,22 @@ public class VoucherController {
     ApiResponse<String> delete(@PathVariable int id){
         return ApiResponse.<String>builder().data(voucherService.delete(id)).build();
     }
+
+
+    @GetMapping("/vouchers/{id}")
+    ApiResponse<VoucherResponseDTO> get(@PathVariable int id){
+        return ApiResponse.<VoucherResponseDTO>builder().data(voucherService.getVoucher(id)).build();
+    }
+
+
+    @GetMapping("/vouchers/code/{code}")
+    ApiResponse<VoucherResponseDTO> getByCode(@PathVariable String code, @RequestParam int userId, @RequestParam int eventId){
+        return ApiResponse.<VoucherResponseDTO>builder().data(voucherService.getVoucherByCode(userId, code, eventId)).build();
+    }
+
+
+    @PatchMapping("/vouchers/{id}")
+    ApiResponse<VoucherResponseDTO> update(@PathVariable int id, @Valid @RequestBody CreateVoucherDTO request){
+        return ApiResponse.<VoucherResponseDTO>builder().data(voucherService.update(id, request)).build();
+    }
 }

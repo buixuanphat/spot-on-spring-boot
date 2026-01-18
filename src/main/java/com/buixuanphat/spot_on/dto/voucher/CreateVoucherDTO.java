@@ -14,7 +14,7 @@ import java.time.Instant;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class CreateVoucherDTO {
-    @Size(min = 6, max = 10, message = "Mã phải có độ dài từ 6 đến 10 kí tự")
+    @Size(min = 6, max = 20, message = "Mã phải có độ dài từ 6 đến 20 kí tự")
     String code;
     @Size(min = 3, max = 100, message = "Mô tả phải có độ dài từ 6 đến 10 kí tự")
     String description;
@@ -24,4 +24,5 @@ public class CreateVoucherDTO {
     Integer limitUsed;
     String type;
     Double value;
+    String tier;
 }

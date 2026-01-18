@@ -14,4 +14,6 @@ public interface VoucherRepository extends JpaRepository<Voucher, Integer> {
     Optional<List<Voucher>> findAllByOrganizer_Id(int organizerId);
 
     Optional<List<Voucher>> findAllByCodeContainingIgnoreCaseAndOrganizer_Id(String code, int organizerId);
+
+    Optional<Voucher> findByCode(String code);
 }

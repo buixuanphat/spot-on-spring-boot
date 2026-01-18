@@ -19,7 +19,6 @@ public class UserResponseDTO {
     String firstname;
     String lastname;
     String email;
-    String dateOfBirth;
     String avatar;
     Integer coins;
     String tier;
